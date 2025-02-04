@@ -2,7 +2,11 @@
 
 langchain
 langchain_community
-jupyter
+langchain-huggingface
 
+jupyter
+beautifulsoup4
 # serpapi
 google-search-results
+
+faiss-cpu
