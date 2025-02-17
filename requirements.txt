@@ -6,3 +6,7 @@ jupyter
 
 # serpapi
 google-search-results
+
+# crawling
+trafilatura
+beautifulsoup4
