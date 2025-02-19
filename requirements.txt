@@ -3,6 +3,7 @@
 langchain
 langchain_community
 jupyter
+openai==1.61.0
 
 # serpapi
 google-search-results
@@ -11,3 +12,6 @@ google-search-results
 trafilatura
 beautifulsoup4
 playwright
+
+# DB
+mysqlclient==2.2.7
