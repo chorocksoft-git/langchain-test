@@ -4,7 +4,9 @@ from langchain.schema import Document
 import trafilatura
 from bs4 import BeautifulSoup
 import json
+from dotenv import load_dotenv
 
+load_dotenv()
 
 """
 - 현재 뉴스 기사 정도만 깔끔하게 추출가능
@@ -20,13 +22,13 @@ def google_web_browsing(param):
         "q": param,
         "gl": "KR",
         "hl": "ko",
-        "api_key": "ea2397acd164f428f4f61362101600ac097bc109ef9e7a59b49aa37907955f22"
+        "api_key": "ea2397acd164f428f4f61362101600ac097bc109ef9e7a59b49aa37907955f22",
     }
     search = GoogleSearch(params)
     search_results = search.get_dict()
 
     # 링크 추출
-    urls = [result['link'] for result in search_results.get('organic_results', [])[:5]]
+    urls = [result["link"] for result in search_results.get("organic_results", [])[:5]]
 
     # # 크롤링할 URL 리스트
     # urls = [
@@ -51,8 +53,11 @@ def google_web_browsing(param):
 
         # 본문 추출
         main_content = trafilatura.extract(
-            cleaned_html, output_format="json",
-            include_comments=False, include_links=False, with_metadata=True
+            cleaned_html,
+            output_format="json",
+            include_comments=False,
+            include_links=False,
+            with_metadata=True,
         )
 
         if main_content:  # None 방지
@@ -67,7 +72,7 @@ def google_web_browsing(param):
             if text:  # 본문이 있을 경우만 Document 생성
                 doc_obj = Document(
                     page_content=text,
-                    metadata={"title": title, "date": date, "url": url}
+                    metadata={"title": title, "date": date, "url": url},
                 )
                 documents.append(doc_obj)
 

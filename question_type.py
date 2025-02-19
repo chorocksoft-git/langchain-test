@@ -30,3 +30,18 @@ class QuestionData(BaseModel):
         default=None,
         description="질문을 이해하는 데 필요한 추가적인 맥락. 없으면 None을 반환.",
     )
+
+    def to_search_query(self) -> str:
+        terms = []
+        for field_name, model_field_value in self.dict().items():
+            if model_field_value is not None:
+                if isinstance(model_field_value, Enum):
+                    # Enum인 경우, .value를 사용하여 문자열로 변환
+                    terms.append(model_field_value.value)
+                elif isinstance(model_field_value, list):
+                    # 리스트인 경우, 내부 문자열들을 공백으로 연결
+                    terms.append(" ".join(model_field_value))
+                else:
+                    # 그 외의 경우, 문자열로 변환
+                    terms.append(str(model_field_value))
+        return " ".join(terms)

@@ -10,3 +10,4 @@ google-search-results
 # crawling
 trafilatura
 beautifulsoup4
+playwright
