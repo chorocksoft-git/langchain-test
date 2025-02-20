@@ -1,3 +1,4 @@
+import os
 from serpapi import GoogleSearch
 from langchain_community.document_loaders import AsyncChromiumLoader
 from langchain.schema import Document
@@ -6,7 +7,7 @@ from bs4 import BeautifulSoup
 import json
 from dotenv import load_dotenv
 from chain.search_chain import create_special_search_chain
-load_dotenv()
+
 
 """
 - 현재 뉴스 기사 정도만 깔끔하게 추출가능
@@ -16,11 +17,12 @@ load_dotenv()
 
 
 def google_web_browsing(user_input):
+
+    # load_dotenv()
+    # api_key = os.environ("SERPAPI_API_KEY")
     # print(f"param : {param}")
     spec_search_chain = create_special_search_chain()
-    search_comment = spec_search_chain.invoke(
-        {"question": user_input}
-    )
+    search_comment = spec_search_chain.invoke({"question": user_input})
     # param = search_comment
     # print(f"param : {param}")
 
@@ -30,7 +32,8 @@ def google_web_browsing(user_input):
         "q": search_comment,
         "gl": "KR",
         "hl": "ko",
-        "api_key": "ea2397acd164f428f4f61362101600ac097bc109ef9e7a59b49aa37907955f22",
+        "api_key": "d5a3d6ce59b748413835bb36be6dca36a8742670e347e9c34f4a426f9cec280e",
+        # "api_key": "ea2397acd164f428f4f61362101600ac097bc109ef9e7a59b49aa37907955f22",
     }
     search = GoogleSearch(params)
     search_results = search.get_dict()
