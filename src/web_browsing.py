@@ -5,7 +5,7 @@ import trafilatura
 from bs4 import BeautifulSoup
 import json
 from dotenv import load_dotenv
-
+from chain.search_chain import create_special_search_chain
 load_dotenv()
 
 """
@@ -15,11 +15,19 @@ load_dotenv()
 """
 
 
-def google_web_browsing(param):
+def google_web_browsing(user_input):
+    # print(f"param : {param}")
+    spec_search_chain = create_special_search_chain()
+    search_comment = spec_search_chain.invoke(
+        {"question": user_input}
+    )
+    # param = search_comment
+    # print(f"param : {param}")
+
     # 구글 검색
     params = {
         "engine": "google",
-        "q": param,
+        "q": search_comment,
         "gl": "KR",
         "hl": "ko",
         "api_key": "ea2397acd164f428f4f61362101600ac097bc109ef9e7a59b49aa37907955f22",

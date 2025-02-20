@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import sys
 import asyncio
 
+from chain.search_chain import create_special_search_chain
 from chain.q_type_chain import create_question_classification_chain
 from chain.res_chain import create_response_chain
 from log import langsmith
@@ -34,7 +35,6 @@ if "messages" not in st.session_state:
     # 대화 기록을 저장하기위한 용도
     st.session_state["messages"] = []
 
-
 with st.sidebar:
     clear_btn = st.button("대화초기화")
     selected_prompt = st.selectbox(
@@ -57,13 +57,10 @@ def add_message(role, message):
 if clear_btn:
     st.session_state["messages"] = []
 
-
 # 이전 대화 기록 출력
 print_messages()
 
-
 user_input = st.chat_input("궁금한 내용을 물어보세요!")
-
 
 if user_input:
     # 웹에 대화를 출력
@@ -81,13 +78,12 @@ if user_input:
     # print(question_information.to_search_query())
     # print("=" * 50)
     # 질문에 관한 정보를 검색
-    search_documents = google_web_browsing(question_information.to_search_query())
+    search_documents = google_web_browsing(user_input)
 
     for i in search_documents:
         print(i.page_content)
 
     # 질문과의 연관성
-    
 
     # 적절한 답변을 생성하는 chain
     response_chain = create_response_chain()
@@ -97,15 +93,22 @@ if user_input:
     with st.chat_message("assistant"):
         container = st.empty()
         ai_answer = ""
-        for _, v in enumerate(question_information.dict()):
-            if question_information.dict()[v] != None:
-                ai_answer += str(v) + " : "
-                ai_answer += str(question_information.dict()[v])
-            ai_answer += "\n"
+        # for _, v in enumerate(question_information.dict()):
+        #     if question_information.dict()[v] is not None:
+        #         ai_answer += str(v) + " : "
+        #         ai_answer += str(question_information.dict()[v])
+        #     ai_answer += "\n"
         # print(ai_answer, type(ai_answer))
         for token in response:
             ai_answer += token
-            container.markdown(ai_answer)
+            formatted_answer = f"```markdown\n{ai_answer}\n```"
+            # Markdown 강제 렌더링
+            container.markdown(formatted_answer, unsafe_allow_html=True)
+
+        # ai_answer += "\n"
+        # for i in search_documents:
+        #     ai_answer += "\n"
+        #     ai_answer += i.metadata['url']
 
     # 대화기록을 저장
     add_message("user", user_input)
