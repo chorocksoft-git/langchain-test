@@ -2,6 +2,7 @@
 
 langchain
 langchain_community
+langchain-openai
 jupyter
 openai==1.61.0
 
@@ -15,3 +16,5 @@ playwright
 
 # DB
 mysqlclient==2.2.7
+
+
