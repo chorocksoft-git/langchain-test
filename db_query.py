@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from langchain.chains.llm import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.sql_database import SQLDatabase
-from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from sqlalchemy import text
 
 
@@ -53,9 +53,12 @@ def generate_sql_query(llm, table_info, question):
     질문:
     {question}
 
-    SQL 쿼리 (주석 없이 오직 순수 쿼리만 출력):
+    SQL 쿼리 (마크다운형식 없이 주석 없이 오직 순수 쿼리만 출력):
     """
-    prompt = PromptTemplate(template=sql_prompt_template, input_variables=["table_info", "question"])
+    # llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+    prompt = PromptTemplate(
+        template=sql_prompt_template, input_variables=["table_info", "question"]
+    )
     sql_generation_chain = LLMChain(llm=llm, prompt=prompt)
     return sql_generation_chain.run(table_info=table_info, question=question)
 
@@ -91,13 +94,17 @@ def generate_natural_language_answer(llm, query_result, column_names, question):
     결과가 없을 경우 사용자 질문: {question}에 대한 정보를 찾을 수 없다고 말해줘.
     작성된 답변:
     """
-    nl_prompt = PromptTemplate(template=nl_prompt_template, input_variables=["columns", "result"])
+    nl_prompt = PromptTemplate(
+        template=nl_prompt_template, input_variables=["columns", "result"]
+    )
     nl_chain = LLMChain(llm=llm, prompt=nl_prompt)
-    answer = nl_chain.run(columns=", ".join(column_names), result=formatted_result, question=question)
+    answer = nl_chain.run(
+        columns=", ".join(column_names), result=formatted_result, question=question
+    )
     return answer
 
 
-def main():
+def main2(question):
     # 1. 환경 변수(.env)에서 API 키와 DB 접속 정보를 로드합니다.
     api_key, username, password, host, port, database = load_env_variables()
 
@@ -114,23 +121,27 @@ def main():
     llm = ChatOpenAI(
         temperature=0,
         openai_api_key=api_key,
-        model_name="gpt-4"  # 또는 "gpt-3.5-turbo"
+        model_name="gpt-4o-mini",  # 또는 "gpt-3.5-turbo"
     )
 
     # 4. 사용자의 질문에 대해 SQL 쿼리 생성
-    question = "2024년 9월 28일에 열린 야구 경기 결과를 알려주세요."
+    # question = "2024년 9월 28일에 열린 야구 경기 결과를 알려주세요."
     sql_query = generate_sql_query(llm, table_info, question)
     print("생성된 SQL 쿼리:\n", sql_query)
 
     # 5. SQL 쿼리 실행 및 컬럼/결과 정보 추출
     columns, query_result = execute_sql_query(db, sql_query)
-    print("컬럼 이름:", columns)
-    print("쿼리 결과:", query_result)
+    # print("컬럼 이름:", columns)
+    # print("쿼리 결과:", query_result)
+    return columns, query_result
 
-    # 6. 쿼리 결과를 자연어 답변으로 변환
-    final_answer = generate_natural_language_answer(llm, query_result, columns, question)
-    print("자연어 답변:\n", final_answer)
+    # # 6. 쿼리 결과를 자연어 답변으로 변환
+    # final_answer = generate_natural_language_answer(
+    #     llm, query_result, columns, question
+    # )
+    # print("자연어 답변:\n", final_answer)
+    # return final_answer
 
 
 if __name__ == "__main__":
-    main()
+    pass
