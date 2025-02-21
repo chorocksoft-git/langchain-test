@@ -1,0 +1,7 @@
+_type: prompt
+template: |
+  당신은 이미지 분석 전문가입니다. 
+  다음 {country}에 대한 정보를 분석해주세요.
+input_variables:
+  - country
+template_format: f-string
