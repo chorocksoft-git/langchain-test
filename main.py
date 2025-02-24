@@ -39,6 +39,8 @@ def add_message(role, message):
     st.session_state["messages"].append(ChatMessage(role=role, content=message))
 
 
+print_messages()
+
 # 파일 업로더 추가
 uploaded_file = st.file_uploader(
     "이미지를 업로드해주세요",
@@ -64,7 +66,9 @@ if uploaded_file:
             processed_file_path = out_file.name
 
         # 이미지 리사이즈 및 패딩 적용
-        resize_and_pad_custom(tmp_file_path, processed_file_path, target_width=1024, target_height=1024)
+        resize_and_pad_custom(
+            tmp_file_path, processed_file_path, target_width=1024, target_height=1024
+        )
 
         # 결과 이미지 출력 (옵션)
         st.image(tmp_file_path, caption="업로드된 이미지")
@@ -80,13 +84,12 @@ if uploaded_file:
 
         # 분석 결과 저장 (채팅용과 내부용 두 역할로 저장)
         add_message("assistant", assistant_response)
-        add_message("assistant_content", assistant_response)
+        # add_message("assistant_content", assistant_response)
         st.session_state["assistant_content"] = assistant_response
 
 # assistant_content가 세션 상태에 저장되어 있다면 이를 변수로 사용
 assistant_content = st.session_state["assistant_content"]
 
-print_messages()
 
 user_input = st.chat_input("궁금한것 입력")
 if user_input:
@@ -94,7 +97,9 @@ if user_input:
     add_message("user", user_input)
 
     chain = answer_chain()
-    response = chain.stream({"assistant_content": assistant_content, "question": user_input})
+    response = chain.stream(
+        {"assistant_content": assistant_content, "question": user_input}
+    )
 
     container = st.empty()
     ai_answer = ""

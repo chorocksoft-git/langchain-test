@@ -3,6 +3,8 @@
 langchain
 langchain_community
 langchain-openai
+langchain_teddynote
+
 jupyter
 openai==1.61.0
 
