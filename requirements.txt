@@ -3,8 +3,12 @@
 langchain
 langchain_community
 langchain-openai
+langchain-huggingface
 jupyter
 openai==1.61.0
+torch
+sentence-transformers
+SQLAlchemy
 
 # serpapi
 google-search-results
