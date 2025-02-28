@@ -10,7 +10,7 @@ from langchain.chains import RetrievalQA
 from langchain_huggingface import HuggingFaceEmbeddings
 
 
-def create_response_chain(documents):
+def retrieval_qa_chain(documents):
     """
     웹 브라우징 결과(Document 객체 리스트)를 입력받아,
     가장 유사한 텍스트 청크만 LLM에 전달하는 Retrieval 기반 체인을 생성합니다.
@@ -21,7 +21,6 @@ def create_response_chain(documents):
         chunk_size=1000,
         chunk_overlap=100,
         length_function=len,
-        separators=["\n\n", "\n", " ", ""],  # 문단 > 줄바꿈 > 공백 순으로 분리
         is_separator_regex=False
     )
 
@@ -58,19 +57,26 @@ def create_response_chain(documents):
     prompt = PromptTemplate.from_template(
         """
         당신은 스포츠 정보를 제공하는 AI 어시스턴트입니다.  
-        사용자의 질문에 대해 핵심 정보를 정리하여 **Markdown 형식으로 간결하게 출력**하세요.
+        사용자의 질문에 대해 **REFERENCE를 기반으로 Markdown 형식으로 정확한 답변을 제공**하세요.
 
         ### **출력 규칙:**  
-        - **제목을 활용하여 가독성을 높이세요.**  
-        - **리스트(`-`), 굵은 글씨(`**`), 이모지(`⚽`, `📅`, `🏟️`) 등을 활용하세요.**  
-        - **각 문장은 해당하는 출처 URL을 포함하세요.**  
-        - **문장 끝에 `[출처](URL)` 형식으로 출처를 표기하세요.**  
-            - 레퍼런스에 출처가 없을 경우 출처는 표기하지 마세요.
         - **모든 답변을 Markdown 스타일로 제공하세요.**  
-        - **레퍼런스에 정보가 없을 경우, 딱딱한 표현 대신 친절한 서비스 말투를 사용하세요.**  
+        - **대, 중, 소 제목을 활용하여 가독성을 높이세요.**  
+        - **리스트(`-`), 굵은 글씨(`**`), 이모지 등을 활용하세요.**  
+        - **REFERENCE를 참고하여 작성한 문장에는 반드시 해당 출처 URL을 포함하세요.** 
+          - 문장 끝에 `[출처](URL)` 형식으로 출처를 표기하세요.  
+          - **출처가 Unknown인 경우 해당 문장에서 출처를 제거하세요.**  
+          - REFERENCE가 없을 경우 출처는 표기하지 마세요.
+        - **출처는 반드시 문장 내부에 포함되어야 하며, 문장과 별도로 표기하지 마세요.** 
+        - **출력 예시:**  
+            ### **경기 일정** 
+                * **팀 A vs 팀 B** 🏆 
+                    * 날짜: 2025년 2월 28일 [출처](https://example.com) 
+                    * 경기장: 서울월드컵경기장 [출처](https://example.com) 
+        - **REFERENCE에 정보가 없을 경우, 딱딱한 표현 대신 친절한 서비스 말투를 사용하세요.**  
           - 예: "오늘은 편성된 경기가 없습니다. 하지만 다음 경기 일정은 다음과 같습니다."  
           - 예: "현재 관련된 정보가 확인되지 않아요. 하지만 다른 궁금한 점이 있다면 알려주세요!" 
-          - 레퍼런스가 없을 경우 출처는 표기하지 마세요.
+          
 
         ### **REFERENCE:**  
         {context}

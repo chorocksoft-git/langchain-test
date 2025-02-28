@@ -4,6 +4,7 @@ from langchain.schema import Document
 import trafilatura
 from bs4 import BeautifulSoup
 import json
+from urllib.parse import urlparse
 
 
 async def google_web_browsing(search_query):
@@ -22,13 +23,20 @@ async def google_web_browsing(search_query):
     search_results = search.results(query=search_query)
     organic_results = search_results.get("organic_results", [])
 
-    # 특정 도메인을 제외하고 링크 추출
-    exclude_domains = ["namu.wiki"]
+    # 제외할 도메인 목록
+    exclude_domains = {"namu.wiki", "x.com"}  # set을 사용하여 빠른 검색 가능
+
+    # 필터링된 URL 리스트
     urls = []
+
     for result in organic_results:
         link = result.get("link")
-        if link and not any(domain in link for domain in exclude_domains):
-            urls.append(link)
+        if link:
+            parsed_url = urlparse(link)
+            domain = parsed_url.netloc  # 도메인만 추출 (예: 'x.com', 'namu.wiki')
+
+            if domain not in exclude_domains:
+                urls.append(link)
 
     if not urls:
         return []  # 검색 결과가 없으면 빈 리스트 반환

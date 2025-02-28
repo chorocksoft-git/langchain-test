@@ -5,28 +5,15 @@ from dotenv import load_dotenv
 import sys
 import asyncio
 
-from chain.q_type_chain import create_question_classification_chain
-from chain.res_chain import (
-    create_response_chain,
-)
+from chain.question_classifier_chain import create_question_classification_chain
+from chain.rag_chain import create_rag_chain
+
 from log import langsmith
 from src.web_browsing import google_web_browsing
-
-# res_chian.py에 HuggingFaceEmbeddings 추가하니까 에러나서 넣은 코드
-# 에러 난 이후로 streamlit이 살짝 맛탱이가 가서 출력을 이상하게 함
-# import torch
-# torch.classes.__path__ = [os.path.join(torch.__path__[0], torch.classes.__file__)]
 
 # python -m streamlit run main.py
 
 load_dotenv()
-
-api_key = os.getenv("OPENAI_API_KEY")
-username = os.getenv("DBUSERNAME")
-password = os.getenv("PASSWORD")
-host = os.getenv("HOST")
-port = os.getenv("PORT")
-database = os.getenv("DATABASE")
 
 project_name = "SAI"
 
@@ -81,11 +68,13 @@ if user_input:
     print(f"question_information.search_query : {question_information.search_query}")
     reference = asyncio.run(google_web_browsing(question_information.search_query))
 
-    # 변경된 체인 생성 (documents를 인자로 전달)
-    response_chain = create_response_chain(reference)
+    # RetrievalQA chain
+    # response_chain = retrieval_qa_chain(reference)
+    # response = response_chain.stream({"query": question_information.llm_query})
 
-    # 질문만 전달하면 retriever가 내부적으로 관련 reference를 채워줌
-    response = response_chain.stream({"query": question_information.llm_query})
+    response_chain = create_rag_chain(reference)
+    response = response_chain.invoke(question_information.llm_query)
+    print(response)
 
     with st.chat_message("assistant"):
         container = st.empty()
