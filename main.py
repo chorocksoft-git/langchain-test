@@ -72,6 +72,7 @@ if user_input:
     # response_chain = retrieval_qa_chain(reference)
     # response = response_chain.stream({"query": question_information.llm_query})
 
+    # RAG chain
     response_chain = create_rag_chain(reference)
     response = response_chain.invoke(question_information.llm_query)
     print(response)
