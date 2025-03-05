@@ -9,7 +9,7 @@ from chain.question_classifier_chain import create_question_classification_chain
 from chain.rag_chain import create_rag_chain
 
 from log import langsmith
-from src.web_browsing import google_web_browsing
+from src.web_browsing_v1 import google_web_browsing
 
 # python -m streamlit run main.py
 
