@@ -1,6 +1,13 @@
 from langchain.schema import Document
 from langchain_core.prompts import PromptTemplate
 
+from langchain.chains.llm import LLMChain
+from langchain.prompts import PromptTemplate
+from langchain.sql_database import SQLDatabase
+from langchain_openai import ChatOpenAI
+from sqlalchemy import text
+
+
 def generate_sql_query(llm, table_info, question):
     """스키마 정보와 사용자의 질문을 바탕으로 SQL 쿼리를 생성하고 Document 객체로 반환"""
     sql_prompt_template = """
@@ -31,7 +38,7 @@ def generate_sql_query(llm, table_info, question):
         page_content=sql_query,  # SQL 쿼리를 문서 내용으로 저장
         metadata={
             "source": "SQL_Generation",
-            "table_info": table_info[:500],  # 메타데이터 크기를 제한 (너무 길면 문제 발생 가능)
+            "table_info": table_info[:1000],  # 메타데이터 크기를 제한 (너무 길면 문제 발생 가능)
             "question": question,
         }
     )
